@@ -172,14 +172,20 @@ function loadUserStats() {
                 console.log('=== STATS LOADED ===');
                 console.log('Is Real Data:', playerData.isRealData);
                 console.log('Player Name:', playerData.name);
+                console.log('Player Trophies:', playerData.trophies);
+                console.log('Number of Brawlers:', playerData.brawlers ? playerData.brawlers.length : 0);
                 console.log('Full Player Data:', playerData);
                 
                 // Update stats with proper formatting
-                statsSubtitle.textContent = `${playerData.name}'s Performance`;
+                const displayName = playerData.name && playerData.name !== 'Unknown Player' 
+                    ? playerData.name 
+                    : `Player #${brawlTag}`;
+                statsSubtitle.textContent = `${displayName}'s Performance`;
                 
                 // Display trophies
-                trophyCount.textContent = playerData.trophies.toLocaleString();
-                console.log('Set trophies to:', playerData.trophies);
+                const trophies = playerData.trophies || 0;
+                trophyCount.textContent = trophies.toLocaleString();
+                console.log('✅ Set trophies to:', trophies);
                 
                 // Get highest trophy brawler
                 if (playerData.brawlers && playerData.brawlers.length > 0) {
@@ -189,8 +195,12 @@ function loadUserStats() {
                     );
                     const topBrawler = sortedBrawlers[0];
                     
-                    highestBrawler.textContent = `${topBrawler.name} (${topBrawler.trophies || 0} 🏆)`;
-                    console.log('Set highest brawler to:', topBrawler);
+                    if (topBrawler && topBrawler.name) {
+                        highestBrawler.textContent = `${topBrawler.name} (${topBrawler.trophies || 0} 🏆)`;
+                        console.log('✅ Set highest brawler to:', topBrawler.name, 'with', topBrawler.trophies, 'trophies');
+                    } else {
+                        highestBrawler.textContent = 'No brawler data';
+                    }
                 } else {
                     highestBrawler.textContent = 'No brawlers unlocked';
                     console.log('No brawlers available');
@@ -204,19 +214,20 @@ function loadUserStats() {
                 
                 console.log('Victory breakdown - Solo:', soloWins, 'Duo:', duoWins, 'Squad:', squadWins, 'Total:', totalVictories);
                 victoriesCount.textContent = totalVictories.toLocaleString();
+                console.log('✅ Set victories to:', totalVictories);
 
                 // Store player data for use in other sections
                 sessionStorage.setItem('playerData', JSON.stringify(playerData));
                 
                 // Display data status
                 if (playerData.isRealData) {
-                    console.log('✅ DISPLAYING REAL API DATA');
+                    console.log('✅✅✅ DISPLAYING REAL API DATA ✅✅✅');
                 } else {
-                    console.warn('⚠️ DISPLAYING MOCK DATA (API call may have failed)');
+                    console.warn('⚠️⚠️⚠️ DISPLAYING MOCK DATA (API call may have failed) ⚠️⚠️⚠️');
                 }
             })
             .catch(error => {
-                console.error('Error loading player stats:', error);
+                console.error('❌ Error loading player stats:', error);
                 statsSubtitle.textContent = 'Could not load stats. Check browser console for details.';
                 trophyCount.textContent = 'Error';
                 highestBrawler.textContent = 'Error';

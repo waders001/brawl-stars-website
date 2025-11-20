@@ -19,41 +19,99 @@ const BrawlStarsAPI = {
             const cleanTag = tag.replace('#', '').toUpperCase();
             const encodedTag = encodeURIComponent(cleanTag);
             
-            // Use Official Brawl Stars API with authentication token
-            const url = `${this.BASE_URL}/players/%23${cleanTag}`;
-            console.log('Fetching from:', url);
+            console.log('=== ATTEMPTING API CALL ===');
+            console.log('Tag:', cleanTag);
             
-            const response = await fetch(url, {
+            // Try Official Brawl Stars API first
+            let url = `${this.BASE_URL}/players/%23${cleanTag}`;
+            console.log('Trying Official API:', url);
+            
+            try {
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${this.API_TOKEN}`
+                    }
+                });
+
+                console.log('API Response Status:', response.status);
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('✅ SUCCESS: Official API returned data');
+                    console.log('API Response Data:', data);
+                    return this.parsePlayerData(data);
+                }
+            } catch (officialError) {
+                console.warn('Official API failed:', officialError.message);
+            }
+
+            // Fallback: Try RoyaleAPI (works without authentication)
+            console.log('Falling back to RoyaleAPI...');
+            const royaleUrl = `https://api.royaleapi.com/profile/${cleanTag}`;
+            console.log('Trying RoyaleAPI:', royaleUrl);
+            
+            const royaleResponse = await fetch(royaleUrl, {
                 method: 'GET',
                 headers: {
-                    'Accept': 'application/json',
-                    'Authorization': `Bearer ${this.API_TOKEN}`
+                    'Accept': 'application/json'
                 }
             });
 
-            console.log('API Response Status:', response.status);
-
-            if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                console.error(`API Error: ${response.status}`, errorData);
-                
-                // Log more details for debugging
-                console.warn('API call failed, falling back to mock data. Status:', response.status);
-                console.warn('URL attempted:', url);
-                
-                throw new Error(`API Error: ${response.status} - ${response.statusText}`);
+            if (!royaleResponse.ok) {
+                throw new Error(`RoyaleAPI Error: ${royaleResponse.status}`);
             }
 
-            const data = await response.json();
-            console.log('API Response Data:', data);
-            return this.parsePlayerData(data);
+            const royaleData = await royaleResponse.json();
+            console.log('✅ SUCCESS: RoyaleAPI returned data');
+            console.log('RoyaleAPI Response:', royaleData);
+            return this.parseRoyaleAPIData(royaleData);
 
         } catch (error) {
-            console.error('Error fetching player profile:', error);
+            console.error('All API attempts failed:', error);
             console.warn('Using mock data as fallback');
             // Fall back to mock data for development
             return this.getMockPlayerData(tag);
         }
+    },
+
+    /**
+     * Parse RoyaleAPI response format
+     * @param {Object} data - RoyaleAPI response
+     * @returns {Object} Formatted player data
+     */
+    parseRoyaleAPIData(data) {
+        console.log('=== PARSING ROYALEAPI DATA ===');
+        console.log('Raw RoyaleAPI Response:', data);
+        
+        return {
+            tag: data.tag || 'N/A',
+            name: data.name || 'Unknown Player',
+            trophies: data.trophies || 0,
+            highestTrophies: data.highestTrophies || 0,
+            expLevel: data.expLevel || 1,
+            expPoints: data.expPoints || 0,
+            soloShowdownWins: data.soloShowdownWins || 0,
+            duoShowdownWins: data.duoShowdownWins || 0,
+            tripleShowdownWins: data.tripleShowdownWins || 0,
+            soloVictories: data.soloShowdownWins || 0,
+            duoVictories: data.duoShowdownWins || 0,
+            squadVictories: data.tripleShowdownWins || 0,
+            brawlers: data.brawlers ? data.brawlers.map(b => ({
+                id: b.id,
+                name: b.name,
+                power: b.power,
+                rank: b.rank || 0,
+                trophies: b.trophies,
+                highestTrophies: b.highestTrophies
+            })) : [],
+            club: data.club ? data.club.name : 'No Club',
+            clubTag: data.club ? data.club.tag : null,
+            totalBrawlers: data.brawlers ? data.brawlers.length : 0,
+            totalTrophies: (data.brawlers || []).reduce((sum, b) => sum + (b.trophies || 0), 0),
+            isRealData: true
+        };
     },
 
     /**
@@ -62,13 +120,12 @@ const BrawlStarsAPI = {
      * @returns {Object} Formatted player data
      */
     parsePlayerData(data) {
-        // Log raw data for debugging
-        console.log('=== parsePlayerData called ===');
+        console.log('=== PARSING OFFICIAL API DATA ===');
         console.log('Raw API Response:', data);
         
         // Check if this looks like real API data or mock data
         const isRealData = data.brawlers && data.brawlers.length > 0 && data.brawlers[0].id;
-        console.log('Is Real API Data:', isRealData);
+        console.log('Is Real Data:', isRealData);
         console.log('Has brawlers:', data.brawlers ? data.brawlers.length : 0);
         console.log('Player name:', data.name);
         
