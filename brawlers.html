@@ -3,122 +3,667 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Brawl Stars - Brawlers</title>
-    <link rel="stylesheet" href="css/brawlers.css">
+    <title>Brawlers - Brawl Stars</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #0f0f1e 100%);
+            color: #fff;
+            min-height: 100vh;
+            padding-bottom: 50px;
+        }
+
+        /* Navigation */
+        nav {
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 2px solid #ff6b35;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #ff6b35;
+            text-decoration: none;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            list-style: none;
+        }
+
+        .nav-links a {
+            color: #fff;
+            text-decoration: none;
+            transition: color 0.3s;
+            font-weight: 500;
+        }
+
+        .nav-links a:hover,
+        .nav-links a.active {
+            color: #ff6b35;
+        }
+
+        .user-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .user-profile {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: rgba(255, 107, 53, 0.1);
+            border-radius: 20px;
+            cursor: pointer;
+        }
+
+        .profile-pic {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ff6b35, #f7931e);
+        }
+
+        /* Page Header */
+        .page-header {
+            text-align: center;
+            padding: 3rem 2rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .page-header h1 {
+            font-size: 3rem;
+            background: linear-gradient(135deg, #ff6b35, #00d9ff);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+        }
+
+        .page-header p {
+            color: #ccc;
+            font-size: 1.1rem;
+        }
+
+        /* Filter Section */
+        .filter-section {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 2rem;
+        }
+
+        .filter-controls {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+        }
+
+        .search-box {
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 0.8rem 1.2rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 107, 53, 0.3);
+            border-radius: 25px;
+            color: #fff;
+            font-size: 1rem;
+            outline: none;
+            transition: all 0.3s;
+        }
+
+        .search-box input:focus {
+            border-color: #ff6b35;
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .filter-buttons {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 0.7rem 1.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(255, 107, 53, 0.3);
+            border-radius: 20px;
+            color: #fff;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-size: 0.95rem;
+        }
+
+        .filter-btn:hover {
+            background: rgba(255, 107, 53, 0.2);
+            border-color: #ff6b35;
+        }
+
+        .filter-btn.active {
+            background: #ff6b35;
+            border-color: #ff6b35;
+        }
+
+        /* Brawlers Grid */
+        .brawlers-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 2rem;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .brawler-card {
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 107, 53, 0.3);
+            border-radius: 15px;
+            padding: 1.5rem;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .brawler-card:hover {
+            transform: translateY(-5px);
+            border-color: #ff6b35;
+            background: rgba(255, 107, 53, 0.1);
+            box-shadow: 0 10px 30px rgba(255, 107, 53, 0.3);
+        }
+
+        .brawler-image {
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #2a2a3e 0%, #1a1a2e 100%);
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .brawler-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            position: relative;
+            z-index: 2;
+        }
+
+        .brawler-image::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,107,53,0.1) 0%, transparent 70%);
+            animation: rotate 10s linear infinite;
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .brawler-name {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-bottom: 0.5rem;
+            color: #ff6b35;
+        }
+
+        .brawler-type {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            background: rgba(0, 217, 255, 0.2);
+            border: 1px solid #00d9ff;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            margin-bottom: 1rem;
+            color: #00d9ff;
+        }
+
+        .brawler-rarity {
+            display: inline-block;
+            padding: 0.3rem 0.8rem;
+            background: rgba(255, 107, 53, 0.2);
+            border: 1px solid #ff6b35;
+            border-radius: 15px;
+            font-size: 0.85rem;
+            margin-left: 0.5rem;
+            color: #ff6b35;
+        }
+
+        .brawler-stats {
+            margin-top: 1rem;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .stat-label {
+            color: #ccc;
+            font-size: 0.9rem;
+        }
+
+        .stat-value {
+            color: #00d9ff;
+            font-weight: bold;
+        }
+
+        .brawler-description {
+            margin-top: 1rem;
+            color: #aaa;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        /* Mobile Menu Toggle */
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            color: #fff;
+            font-size: 1.5rem;
+            cursor: pointer;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                right: 0;
+                background: rgba(0, 0, 0, 0.95);
+                flex-direction: column;
+                padding: 1rem;
+                gap: 1rem;
+            }
+
+            .nav-links.active {
+                display: flex;
+            }
+
+            .menu-toggle {
+                display: block;
+            }
+
+            .page-header h1 {
+                font-size: 2rem;
+            }
+
+            .filter-controls {
+                flex-direction: column;
+            }
+
+            .brawlers-grid {
+                grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+                gap: 1.5rem;
+            }
+        }
+    </style>
 </head>
 <body>
-    <!-- Navigation Bar -->
-    <nav class="navbar">
+    <!-- Navigation -->
+    <nav>
         <div class="nav-container">
-            <div class="nav-brand">
-                <a href="home.html"><h1>BRAWL STARS</h1></a>
-            </div>
-            
-            <!-- Desktop Navigation -->
-            <ul class="nav-menu">
-                <li><a href="home.html" class="nav-link">Home</a></li>
-                <li><a href="brawlers.html" class="nav-link active">Brawlers</a></li>
-                <li><a href="home.html#modes" class="nav-link">Game Modes</a></li>
-                <li><a href="home.html#maps" class="nav-link">Maps</a></li>
+            <a href="home.html" class="logo">⚡ BRAWL STARS</a>
+            <button class="menu-toggle" onclick="toggleMenu()">☰</button>
+            <ul class="nav-links" id="navLinks">
+                <li><a href="home.html">Home</a></li>
+                <li><a href="brawlers.html" class="active">Brawlers</a></li>
+                <li><a href="game-modes.html">Game Modes</a></li>
+                <li><a href="maps.html">Maps</a></li>
+                <li><a href="club.html">Club</a></li>
             </ul>
-
-            <!-- User Profile -->
-            <div class="nav-profile">
-                <div class="profile-info" id="profileInfo">
-                    <span class="profile-icon">👤</span>
-                    <span class="profile-name" id="profileName">Guest</span>
+            <div class="user-section">
+                <div class="user-profile" onclick="toggleProfile()">
+                    <div class="profile-pic"></div>
+                    <span id="userName">Player</span>
                 </div>
-                <button class="logout-btn" id="logoutBtn">Logout</button>
             </div>
-
-            <!-- Mobile Menu Toggle -->
-            <button class="mobile-menu-toggle" id="mobileMenuToggle">
-                <span></span>
-                <span></span>
-                <span></span>
-            </button>
         </div>
     </nav>
 
-    <!-- Mobile Menu Overlay -->
-    <div class="mobile-menu" id="mobileMenu">
-        <div class="mobile-menu-header">
-            <h2>Menu</h2>
-            <button class="mobile-menu-close" id="mobileMenuClose">&times;</button>
-        </div>
-        <ul class="mobile-nav-links">
-            <li><a href="home.html" class="mobile-nav-link">Home</a></li>
-            <li><a href="brawlers.html" class="mobile-nav-link active">Brawlers</a></li>
-            <li><a href="home.html#modes" class="mobile-nav-link">Game Modes</a></li>
-            <li><a href="home.html#maps" class="mobile-nav-link">Maps</a></li>
-        </ul>
+    <!-- Page Header -->
+    <div class="page-header">
+        <h1>🎯 ALL BRAWLERS</h1>
+        <p>Choose your champion and dominate the arena!</p>
     </div>
 
-    <!-- Main Content -->
-    <main class="main-content">
-        <!-- Hero Section -->
-        <section class="brawlers-hero">
-            <div class="hero-content">
-                <h1 class="hero-title">All Brawlers</h1>
-                <p class="hero-subtitle">Choose your fighter - Each brawler has unique abilities and playstyles</p>
-                <div class="brawler-count">
-                    <span class="count-number" id="brawlerCount">97</span>
-                    <span class="count-label">Unique Characters</span>
-                </div>
+    <!-- Filter Section -->
+    <div class="filter-section">
+        <div class="filter-controls">
+            <div class="search-box">
+                <input type="text" id="searchInput" placeholder="🔍 Search brawlers..." oninput="filterBrawlers()">
             </div>
-        </section>
+        </div>
+        <div class="filter-buttons">
+            <button class="filter-btn active" data-filter="all" onclick="setFilter('all')">All</button>
+            <button class="filter-btn" data-filter="Common" onclick="setFilter('Common')">Common</button>
+            <button class="filter-btn" data-filter="Rare" onclick="setFilter('Rare')">Rare</button>
+            <button class="filter-btn" data-filter="Super Rare" onclick="setFilter('Super Rare')">Super Rare</button>
+            <button class="filter-btn" data-filter="Epic" onclick="setFilter('Epic')">Epic</button>
+            <button class="filter-btn" data-filter="Mythic" onclick="setFilter('Mythic')">Mythic</button>
+            <button class="filter-btn" data-filter="Legendary" onclick="setFilter('Legendary')">Legendary</button>
+        </div>
+    </div>
 
-        <!-- Filter Section -->
-        <section class="filter-section">
-            <div class="filter-container">
-                <div class="filter-group">
-                    <label>Rarity</label>
-                    <div class="filter-buttons">
-                        <button class="filter-btn active" data-rarity="all">All</button>
-                        <button class="filter-btn" data-rarity="starter">Starter</button>
-                        <button class="filter-btn" data-rarity="rare">Rare</button>
-                        <button class="filter-btn" data-rarity="super-rare">Super Rare</button>
-                        <button class="filter-btn" data-rarity="epic">Epic</button>
-                        <button class="filter-btn" data-rarity="mythic">Mythic</button>
-                        <button class="filter-btn" data-rarity="legendary">Legendary</button>
+    <!-- Brawlers Grid -->
+    <div class="brawlers-grid" id="brawlersGrid"></div>
+
+    <script>
+        // Sample brawler data with real images
+        const brawlers = [
+            {
+                name: "Shelly",
+                type: "Fighter",
+                rarity: "Common",
+                health: 3600,
+                attack: 300,
+                super: "Super Shell",
+                description: "Shelly's spread-shot attacks and her Super make her a formidable foe at close range!",
+                image: "https://cdn-old.brawlify.com/brawler/Shelly.png"
+            },
+            {
+                name: "Colt",
+                type: "Sharpshooter",
+                rarity: "Common",
+                health: 2400,
+                attack: 360,
+                super: "Bullet Storm",
+                description: "Colt fires an accurate burst of bullets. His Super is a long-range storm of bullets!",
+                image: "https://cdn-old.brawlify.com/brawler/Colt.png"
+            },
+            {
+                name: "Bull",
+                type: "Tank",
+                rarity: "Rare",
+                health: 5000,
+                attack: 440,
+                super: "Bulldozer",
+                description: "Bull charges through obstacles, knocking back enemies in his path!",
+                image: "https://cdn-old.brawlify.com/brawler/Bull.png"
+            },
+            {
+                name: "Brock",
+                type: "Sharpshooter",
+                rarity: "Rare",
+                health: 2400,
+                attack: 1040,
+                super: "Rocket Rain",
+                description: "Brock fires rockets with a long range. His Super is a barrage of rockets!",
+                image: "https://cdn-old.brawlify.com/brawler/Brock.png"
+            },
+            {
+                name: "El Primo",
+                type: "Tank",
+                rarity: "Rare",
+                health: 6000,
+                attack: 360,
+                super: "Flying Elbow Drop",
+                description: "El Primo leaps into the fray, landing on enemies with his Super!",
+                image: "https://cdn-old.brawlify.com/brawler/El-Primo.png"
+            },
+            {
+                name: "Poco",
+                type: "Support",
+                rarity: "Super Rare",
+                health: 3800,
+                attack: 660,
+                super: "Encore",
+                description: "Poco plays healing music for himself and nearby allies!",
+                image: "https://cdn-old.brawlify.com/brawler/Poco.png"
+            },
+            {
+                name: "Rosa",
+                type: "Tank",
+                rarity: "Rare",
+                health: 5200,
+                attack: 464,
+                super: "Strong Stuff",
+                description: "Rosa creates a protective shield of vines that reduces incoming damage!",
+                image: "https://cdn-old.brawlify.com/brawler/Rosa.png"
+            },
+            {
+                name: "Jessie",
+                type: "Fighter",
+                rarity: "Super Rare",
+                health: 3200,
+                attack: 820,
+                super: "Scrappy!",
+                description: "Jessie deploys a gun turret that attacks the nearest enemy!",
+                image: "https://cdn-old.brawlify.com/brawler/Jessie.png"
+            },
+            {
+                name: "Dynamike",
+                type: "Thrower",
+                rarity: "Super Rare",
+                health: 2400,
+                attack: 760,
+                super: "Big Barrel O' Boom",
+                description: "Dynamike lobs two big barrels of TNT that explode over a large area!",
+                image: "https://cdn-old.brawlify.com/brawler/Dynamike.png"
+            },
+            {
+                name: "Nita",
+                type: "Fighter",
+                rarity: "Rare",
+                health: 3800,
+                attack: 820,
+                super: "Overbearing",
+                description: "Nita summons a bear to fight alongside her in battle!",
+                image: "https://cdn-old.brawlify.com/brawler/Nita.png"
+            },
+            {
+                name: "Mortis",
+                type: "Assassin",
+                rarity: "Mythic",
+                health: 3800,
+                attack: 900,
+                super: "Life Blood",
+                description: "Mortis dashes forward with each attack. His Super lets him steal life force!",
+                image: "https://cdn-old.brawlify.com/brawler/Mortis.png"
+            },
+            {
+                name: "Tara",
+                type: "Skirmisher",
+                rarity: "Mythic",
+                health: 3200,
+                attack: 460,
+                super: "Gravity",
+                description: "Tara throws cards that pierce enemies. Her Super pulls enemies together!",
+                image: "https://cdn-old.brawlify.com/brawler/Tara.png"
+            },
+            {
+                name: "Spike",
+                type: "Sharpshooter",
+                rarity: "Legendary",
+                health: 2400,
+                attack: 520,
+                super: "Stick Around",
+                description: "Spike throws a cactus that explodes and shoots spikes in all directions!",
+                image: "https://cdn-old.brawlify.com/brawler/Spike.png"
+            },
+            {
+                name: "Crow",
+                type: "Assassin",
+                rarity: "Legendary",
+                health: 2400,
+                attack: 300,
+                super: "Swoop",
+                description: "Crow leaps and throws daggers that poison enemies, reducing their damage!",
+                image: "https://cdn-old.brawlify.com/brawler/Crow.png"
+            },
+            {
+                name: "Leon",
+                type: "Assassin",
+                rarity: "Legendary",
+                health: 3200,
+                attack: 440,
+                super: "Smoke Bomb",
+                description: "Leon becomes invisible for a short time. He moves faster while invisible!",
+                image: "https://cdn-old.brawlify.com/brawler/Leon.png"
+            },
+            {
+                name: "Pam",
+                type: "Support",
+                rarity: "Epic",
+                health: 5040,
+                attack: 260,
+                super: "Mama's Kiss",
+                description: "Pam deploys a healing turret that restores the health of her and allies!",
+                image: "https://cdn-old.brawlify.com/brawler/Pam.png"
+            },
+            {
+                name: "Barley",
+                type: "Thrower",
+                rarity: "Rare",
+                health: 2400,
+                attack: 680,
+                super: "Last Call",
+                description: "Barley lobs bottles that leave a puddle of damaging liquid on the ground!",
+                image: "https://cdn-old.brawlify.com/brawler/Barley.png"
+            },
+            {
+                name: "Frank",
+                type: "Tank",
+                rarity: "Epic",
+                health: 6800,
+                attack: 1200,
+                super: "Stunning Blow",
+                description: "Frank's Super deals damage and stuns all enemies in range!",
+                image: "https://cdn-old.brawlify.com/brawler/Frank.png"
+            }
+        ];
+
+        let currentFilter = 'all';
+
+        // Render brawlers
+        function renderBrawlers(brawlersToRender) {
+            const grid = document.getElementById('brawlersGrid');
+            grid.innerHTML = '';
+
+            brawlersToRender.forEach(brawler => {
+                const card = document.createElement('div');
+                card.className = 'brawler-card';
+                card.innerHTML = `
+                    <div class="brawler-image">
+                        <img src="${brawler.image}" alt="${brawler.name}" onerror="this.src='data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2280%22>🎮</text></svg>'">
                     </div>
-                </div>
-                
-                <div class="search-box">
-                    <input type="text" id="searchInput" placeholder="🔍 Search brawlers...">
-                </div>
-            </div>
-        </section>
+                    <div class="brawler-name">${brawler.name}</div>
+                    <span class="brawler-type">${brawler.type}</span>
+                    <span class="brawler-rarity">${brawler.rarity}</span>
+                    <div class="brawler-stats">
+                        <div class="stat-row">
+                            <span class="stat-label">Health</span>
+                            <span class="stat-value">${brawler.health}</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Attack</span>
+                            <span class="stat-value">${brawler.attack}</span>
+                        </div>
+                        <div class="stat-row">
+                            <span class="stat-label">Super</span>
+                            <span class="stat-value">${brawler.super}</span>
+                        </div>
+                    </div>
+                    <div class="brawler-description">${brawler.description}</div>
+                `;
+                grid.appendChild(card);
+            });
+        }
 
-        <!-- Brawlers Grid -->
-        <section class="brawlers-section">
-            <div class="brawlers-grid" id="brawlersGrid">
-                <!-- Brawler cards will be dynamically inserted here -->
-            </div>
+        // Filter brawlers
+        function filterBrawlers() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            let filtered = brawlers;
+
+            // Apply rarity filter
+            if (currentFilter !== 'all') {
+                filtered = filtered.filter(b => b.rarity === currentFilter);
+            }
+
+            // Apply search filter
+            if (searchTerm) {
+                filtered = filtered.filter(b => 
+                    b.name.toLowerCase().includes(searchTerm) ||
+                    b.type.toLowerCase().includes(searchTerm)
+                );
+            }
+
+            renderBrawlers(filtered);
+        }
+
+        // Set filter
+        function setFilter(filter) {
+            currentFilter = filter;
             
-            <div class="no-results" id="noResults" style="display: none;">
-                <p>No brawlers found 😢</p>
-                <button class="reset-btn" onclick="resetFilters()">Reset Filters</button>
-            </div>
-        </section>
-    </main>
+            // Update button states
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.remove('active');
+            });
+            event.target.classList.add('active');
 
-    <!-- Brawler Detail Modal -->
-    <div class="brawler-modal" id="brawlerModal">
-        <div class="modal-overlay" id="modalOverlay"></div>
-        <div class="modal-container">
-            <button class="modal-close" id="modalClose">&times;</button>
-            <div class="modal-content" id="modalContent">
-                <!-- Content will be dynamically inserted -->
-            </div>
-        </div>
-    </div>
+            filterBrawlers();
+        }
 
-    <!-- Footer -->
-    <footer class="footer">
-        <p>&copy; 2024 Brawl Stars Fan Site. Not affiliated with Supercell.</p>
-    </footer>
+        // Toggle mobile menu
+        function toggleMenu() {
+            const navLinks = document.getElementById('navLinks');
+            navLinks.classList.toggle('active');
+        }
 
-    <script src="js/brawlers.js"></script>
+        // Toggle profile dropdown
+        function toggleProfile() {
+            alert('Profile menu coming soon!');
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            // Load user data
+            const userData = JSON.parse(localStorage.getItem('userData'));
+            if (userData && userData.username) {
+                document.getElementById('userName').textContent = userData.username;
+            }
+
+            // Render all brawlers initially
+            renderBrawlers(brawlers);
+        });
+    </script>
 </body>
 </html>
