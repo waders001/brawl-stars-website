@@ -15,32 +15,42 @@ const BrawlStarsAPI = {
      */
     async getPlayerProfile(tag) {
         try {
-            // Encode the tag properly (replace # with %23 if present)
-            const encodedTag = encodeURIComponent(tag.replace('#', ''));
+            // Clean up the tag (remove # if present)
+            const cleanTag = tag.replace('#', '').toUpperCase();
+            const encodedTag = encodeURIComponent(cleanTag);
             
             // Use Official Brawl Stars API with authentication token
-            const response = await fetch(
-                `${this.BASE_URL}/players/%23${encodedTag}`,
-                {
-                    method: 'GET',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Authorization': `Bearer ${this.API_TOKEN}`
-                    }
+            const url = `${this.BASE_URL}/players/%23${cleanTag}`;
+            console.log('Fetching from:', url);
+            
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Accept': 'application/json',
+                    'Authorization': `Bearer ${this.API_TOKEN}`
                 }
-            );
+            });
+
+            console.log('API Response Status:', response.status);
 
             if (!response.ok) {
                 const errorData = await response.json().catch(() => ({}));
                 console.error(`API Error: ${response.status}`, errorData);
+                
+                // Log more details for debugging
+                console.warn('API call failed, falling back to mock data. Status:', response.status);
+                console.warn('URL attempted:', url);
+                
                 throw new Error(`API Error: ${response.status} - ${response.statusText}`);
             }
 
             const data = await response.json();
+            console.log('API Response Data:', data);
             return this.parsePlayerData(data);
 
         } catch (error) {
             console.error('Error fetching player profile:', error);
+            console.warn('Using mock data as fallback');
             // Fall back to mock data for development
             return this.getMockPlayerData(tag);
         }

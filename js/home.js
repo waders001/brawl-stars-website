@@ -158,6 +158,7 @@ function loadUserStats() {
     // If logged in with tag, fetch real data from API
     if (loginType === 'tag') {
         const brawlTag = sessionStorage.getItem('brawlTag');
+        console.log('Loading stats for tag:', brawlTag);
         
         // Show loading state
         statsSubtitle.textContent = 'Loading your stats...';
@@ -168,6 +169,8 @@ function loadUserStats() {
         // Fetch player data from API
         BrawlStarsAPI.getPlayerData(brawlTag)
             .then(playerData => {
+                console.log('Stats loaded successfully:', playerData);
+                
                 // Update stats
                 statsSubtitle.textContent = `${playerData.name}'s Performance`;
                 trophyCount.textContent = playerData.trophies.toLocaleString();
@@ -192,11 +195,11 @@ function loadUserStats() {
                 sessionStorage.setItem('playerData', JSON.stringify(playerData));
                 
                 // Display additional info in console for debugging
-                console.log('Player Data Loaded:', playerData);
+                console.log('Full Player Data:', playerData);
             })
             .catch(error => {
                 console.error('Error loading player stats:', error);
-                statsSubtitle.textContent = 'Could not load stats. Please try again.';
+                statsSubtitle.textContent = 'Could not load stats. Check browser console for details.';
                 trophyCount.textContent = 'Error';
                 highestBrawler.textContent = 'Error';
                 victoriesCount.textContent = 'Error';
