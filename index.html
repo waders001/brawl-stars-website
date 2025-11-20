@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brawl Stars - Login</title>
+    <link rel="stylesheet" href="css/login.css">
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="background">
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+        <div class="star"></div>
+    </div>
+
+    <!-- Login Modal -->
+    <div class="login-modal" id="loginModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1>BRAWL STARS</h1>
+                <p class="subtitle">Enter the Arena</p>
+            </div>
+
+            <div class="modal-body">
+                <div class="login-option">
+                    <h2>Sign In with Brawl Stars Tag</h2>
+                    <form id="tagLoginForm">
+                        <div class="input-group">
+                            <span class="hashtag">#</span>
+                            <input 
+                                type="text" 
+                                id="brawlTag" 
+                                placeholder="YOUR TAG" 
+                                maxlength="10"
+                                autocomplete="off"
+                                required
+                            >
+                        </div>
+                        <button type="submit" class="btn-primary">
+                            <span>ENTER GAME</span>
+                        </button>
+                    </form>
+                    <p class="helper-text">Enter your Brawl Stars player tag (without #)</p>
+                </div>
+
+                <div class="divider">
+                    <span>OR</span>
+                </div>
+
+                <div class="guest-option">
+                    <button class="btn-guest" id="guestBtn">
+                        <span>CONTINUE AS GUEST</span>
+                    </button>
+                    <p class="helper-text">Explore without signing in</p>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <p class="info-text">
+                    <span class="icon">ℹ️</span> 
+                    Find your tag in Brawl Stars: Profile → Player Tag
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/login.js"></script>
+</body>
+</html>

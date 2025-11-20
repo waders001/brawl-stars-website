@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brawl Stars - Home</title>
+    <link rel="stylesheet" href="css/home.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <h1>BRAWL STARS</h1>
+            </div>
+            
+            <!-- Desktop Navigation -->
+            <ul class="nav-menu">
+                <li><a href="#home" class="nav-link active">Home</a></li>
+                <li><a href="#brawlers" class="nav-link">Brawlers</a></li>
+                <li><a href="#modes" class="nav-link">Game Modes</a></li>
+                <li><a href="#maps" class="nav-link">Maps</a></li>
+            </ul>
+
+            <!-- User Profile -->
+            <div class="nav-profile">
+                <div class="profile-info" id="profileInfo">
+                    <span class="profile-icon">👤</span>
+                    <span class="profile-name" id="profileName">Guest</span>
+                </div>
+                <button class="logout-btn" id="logoutBtn">Logout</button>
+            </div>
+
+            <!-- Mobile Menu Toggle -->
+            <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu Overlay -->
+    <div class="mobile-menu" id="mobileMenu">
+        <div class="mobile-menu-header">
+            <h2>Menu</h2>
+            <button class="mobile-menu-close" id="mobileMenuClose">&times;</button>
+        </div>
+        <ul class="mobile-nav-links">
+            <li><a href="#home" class="mobile-nav-link active">Home</a></li>
+            <li><a href="#brawlers" class="mobile-nav-link">Brawlers</a></li>
+            <li><a href="#modes" class="mobile-nav-link">Game Modes</a></li>
+            <li><a href="#maps" class="mobile-nav-link">Maps</a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Hero Section -->
+        <section class="hero-section" id="home">
+            <div class="hero-content">
+                <h1 class="hero-title">Welcome to the Arena</h1>
+                <p class="hero-subtitle">Fast-paced 3v3 multiplayer and battle royale made for mobile</p>
+                <div class="hero-stats">
+                    <div class="stat-card">
+                        <span class="stat-number">75+</span>
+                        <span class="stat-label">Brawlers</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number">15+</span>
+                        <span class="stat-label">Game Modes</span>
+                    </div>
+                    <div class="stat-card">
+                        <span class="stat-number">100+</span>
+                        <span class="stat-label">Maps</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Featured Brawlers Section -->
+        <section class="section brawlers-section" id="brawlers">
+            <div class="section-header">
+                <h2 class="section-title">Featured Brawlers</h2>
+                <p class="section-subtitle">Discover unique characters with special abilities</p>
+            </div>
+            <div class="brawlers-grid">
+                <div class="brawler-card">
+                    <div class="brawler-image" style="background: linear-gradient(135deg, #8B5CF6, #6366F1);">
+                        <span class="brawler-icon">🔫</span>
+                    </div>
+                    <div class="brawler-info">
+                        <h3>Colt</h3>
+                        <span class="brawler-rarity rare">Rare</span>
+                        <p>Shoots a burst of bullets with precision</p>
+                    </div>
+                </div>
+
+                <div class="brawler-card">
+                    <div class="brawler-image" style="background: linear-gradient(135deg, #F59E0B, #EF4444);">
+                        <span class="brawler-icon">💣</span>
+                    </div>
+                    <div class="brawler-info">
+                        <h3>Dynamike</h3>
+                        <span class="brawler-rarity super-rare">Super Rare</span>
+                        <p>Lobs explosive dynamite sticks</p>
+                    </div>
+                </div>
+
+                <div class="brawler-card">
+                    <div class="brawler-image" style="background: linear-gradient(135deg, #10B981, #059669);">
+                        <span class="brawler-icon">🌵</span>
+                    </div>
+                    <div class="brawler-info">
+                        <h3>Spike</h3>
+                        <span class="brawler-rarity legendary">Legendary</span>
+                        <p>Throws cactus grenades that explode</p>
+                    </div>
+                </div>
+
+                <div class="brawler-card">
+                    <div class="brawler-image" style="background: linear-gradient(135deg, #EC4899, #DB2777);">
+                        <span class="brawler-icon">🦇</span>
+                    </div>
+                    <div class="brawler-info">
+                        <h3>Mortis</h3>
+                        <span class="brawler-rarity mythic">Mythic</span>
+                        <p>Dashes forward with his shovel</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Game Modes Section -->
+        <section class="section modes-section" id="modes">
+            <div class="section-header">
+                <h2 class="section-title">Game Modes</h2>
+                <p class="section-subtitle">Multiple ways to play and dominate</p>
+            </div>
+            <div class="modes-grid">
+                <div class="mode-card">
+                    <div class="mode-icon">💎</div>
+                    <h3>Gem Grab</h3>
+                    <p>Collect and hold 10 gems to win</p>
+                </div>
+
+                <div class="mode-card">
+                    <div class="mode-icon">⚽</div>
+                    <h3>Brawl Ball</h3>
+                    <p>Score 2 goals before the other team</p>
+                </div>
+
+                <div class="mode-card">
+                    <div class="mode-icon">💰</div>
+                    <h3>Heist</h3>
+                    <p>Crack the safe before time runs out</p>
+                </div>
+
+                <div class="mode-card">
+                    <div class="mode-icon">🏆</div>
+                    <h3>Showdown</h3>
+                    <p>Battle royale mode - last one standing wins</p>
+                </div>
+
+                <div class="mode-card">
+                    <div class="mode-icon">⭐</div>
+                    <h3>Bounty</h3>
+                    <p>Defeat enemies to earn stars for your team</p>
+                </div>
+
+                <div class="mode-card">
+                    <div class="mode-icon">🎯</div>
+                    <h3>Siege</h3>
+                    <p>Collect bolts and build a robot to attack</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Quick Stats Section -->
+        <section class="section stats-section">
+            <div class="section-header">
+                <h2 class="section-title">Your Progress</h2>
+                <p class="section-subtitle" id="statsSubtitle">Track your journey in the arena</p>
+            </div>
+            <div class="stats-grid">
+                <div class="progress-card">
+                    <div class="progress-icon">🏆</div>
+                    <div class="progress-info">
+                        <h3>Trophies</h3>
+                        <p class="progress-value" id="trophyCount">--</p>
+                    </div>
+                </div>
+
+                <div class="progress-card">
+                    <div class="progress-icon">⭐</div>
+                    <div class="progress-info">
+                        <h3>Highest Brawler</h3>
+                        <p class="progress-value" id="highestBrawler">--</p>
+                    </div>
+                </div>
+
+                <div class="progress-card">
+                    <div class="progress-icon">🎮</div>
+                    <div class="progress-info">
+                        <h3>3v3 Victories</h3>
+                        <p class="progress-value" id="victoriesCount">--</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2024 Brawl Stars Fan Site. Not affiliated with Supercell.</p>
+    </footer>
+
+    <script src="js/home.js"></script>
+</body>
+</html>

@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brawl Stars - Brawlers</title>
+    <link rel="stylesheet" href="css/brawlers.css">
+</head>
+<body>
+    <!-- Navigation Bar -->
+    <nav class="navbar">
+        <div class="nav-container">
+            <div class="nav-brand">
+                <a href="home.html"><h1>BRAWL STARS</h1></a>
+            </div>
+            
+            <!-- Desktop Navigation -->
+            <ul class="nav-menu">
+                <li><a href="home.html" class="nav-link">Home</a></li>
+                <li><a href="brawlers.html" class="nav-link active">Brawlers</a></li>
+                <li><a href="home.html#modes" class="nav-link">Game Modes</a></li>
+                <li><a href="home.html#maps" class="nav-link">Maps</a></li>
+            </ul>
+
+            <!-- User Profile -->
+            <div class="nav-profile">
+                <div class="profile-info" id="profileInfo">
+                    <span class="profile-icon">👤</span>
+                    <span class="profile-name" id="profileName">Guest</span>
+                </div>
+                <button class="logout-btn" id="logoutBtn">Logout</button>
+            </div>
+
+            <!-- Mobile Menu Toggle -->
+            <button class="mobile-menu-toggle" id="mobileMenuToggle">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+        </div>
+    </nav>
+
+    <!-- Mobile Menu Overlay -->
+    <div class="mobile-menu" id="mobileMenu">
+        <div class="mobile-menu-header">
+            <h2>Menu</h2>
+            <button class="mobile-menu-close" id="mobileMenuClose">&times;</button>
+        </div>
+        <ul class="mobile-nav-links">
+            <li><a href="home.html" class="mobile-nav-link">Home</a></li>
+            <li><a href="brawlers.html" class="mobile-nav-link active">Brawlers</a></li>
+            <li><a href="home.html#modes" class="mobile-nav-link">Game Modes</a></li>
+            <li><a href="home.html#maps" class="mobile-nav-link">Maps</a></li>
+        </ul>
+    </div>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Hero Section -->
+        <section class="brawlers-hero">
+            <div class="hero-content">
+                <h1 class="hero-title">All Brawlers</h1>
+                <p class="hero-subtitle">Choose your fighter - Each brawler has unique abilities and playstyles</p>
+                <div class="brawler-count">
+                    <span class="count-number" id="brawlerCount">97</span>
+                    <span class="count-label">Unique Characters</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Filter Section -->
+        <section class="filter-section">
+            <div class="filter-container">
+                <div class="filter-group">
+                    <label>Rarity</label>
+                    <div class="filter-buttons">
+                        <button class="filter-btn active" data-rarity="all">All</button>
+                        <button class="filter-btn" data-rarity="starter">Starter</button>
+                        <button class="filter-btn" data-rarity="rare">Rare</button>
+                        <button class="filter-btn" data-rarity="super-rare">Super Rare</button>
+                        <button class="filter-btn" data-rarity="epic">Epic</button>
+                        <button class="filter-btn" data-rarity="mythic">Mythic</button>
+                        <button class="filter-btn" data-rarity="legendary">Legendary</button>
+                    </div>
+                </div>
+                
+                <div class="search-box">
+                    <input type="text" id="searchInput" placeholder="🔍 Search brawlers...">
+                </div>
+            </div>
+        </section>
+
+        <!-- Brawlers Grid -->
+        <section class="brawlers-section">
+            <div class="brawlers-grid" id="brawlersGrid">
+                <!-- Brawler cards will be dynamically inserted here -->
+            </div>
+            
+            <div class="no-results" id="noResults" style="display: none;">
+                <p>No brawlers found 😢</p>
+                <button class="reset-btn" onclick="resetFilters()">Reset Filters</button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Brawler Detail Modal -->
+    <div class="brawler-modal" id="brawlerModal">
+        <div class="modal-overlay" id="modalOverlay"></div>
+        <div class="modal-container">
+            <button class="modal-close" id="modalClose">&times;</button>
+            <div class="modal-content" id="modalContent">
+                <!-- Content will be dynamically inserted -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <p>&copy; 2024 Brawl Stars Fan Site. Not affiliated with Supercell.</p>
+    </footer>
+
+    <script src="js/brawlers.js"></script>
+</body>
+</html>
