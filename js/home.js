@@ -155,16 +155,53 @@ function loadUserStats() {
         return;
     }
 
-    // If logged in with tag, simulate loading stats
-    // In a real app, you would fetch from Brawl Stars API
-    statsSubtitle.textContent = 'Your performance in the arena';
-    
-    // Simulate API loading
-    setTimeout(() => {
-        trophyCount.textContent = '25,847';
-        highestBrawler.textContent = 'Colt (Rank 30)';
-        victoriesCount.textContent = '1,234';
-    }, 500);
+    // If logged in with tag, fetch real data from API
+    if (loginType === 'tag') {
+        const brawlTag = sessionStorage.getItem('brawlTag');
+        
+        // Show loading state
+        statsSubtitle.textContent = 'Loading your stats...';
+        trophyCount.textContent = '⏳';
+        highestBrawler.textContent = '⏳';
+        victoriesCount.textContent = '⏳';
+
+        // Fetch player data from API
+        BrawlStarsAPI.getPlayerData(brawlTag)
+            .then(playerData => {
+                // Update stats
+                statsSubtitle.textContent = `${playerData.name}'s Performance`;
+                trophyCount.textContent = playerData.trophies.toLocaleString();
+                
+                // Get highest trophy brawler
+                if (playerData.brawlers && playerData.brawlers.length > 0) {
+                    const highestBrawlerData = playerData.brawlers.reduce((prev, current) => 
+                        (prev.trophies > current.trophies) ? prev : current
+                    );
+                    highestBrawler.textContent = `${highestBrawlerData.name} (${highestBrawlerData.trophies} 🏆)`;
+                } else {
+                    highestBrawler.textContent = 'No brawlers';
+                }
+                
+                // Calculate total victories
+                const totalVictories = (playerData.soloVictories || 0) + 
+                                      (playerData.duoVictories || 0) + 
+                                      (playerData.squadVictories || 0);
+                victoriesCount.textContent = totalVictories.toLocaleString();
+
+                // Store player data for use in other sections
+                sessionStorage.setItem('playerData', JSON.stringify(playerData));
+                
+                // Display additional info in console for debugging
+                console.log('Player Data Loaded:', playerData);
+            })
+            .catch(error => {
+                console.error('Error loading player stats:', error);
+                statsSubtitle.textContent = 'Could not load stats. Please try again.';
+                trophyCount.textContent = 'Error';
+                highestBrawler.textContent = 'Error';
+                victoriesCount.textContent = 'Error';
+            });
+    }
 }
 
 // Card Animations on Scroll
