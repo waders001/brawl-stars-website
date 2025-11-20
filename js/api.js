@@ -6,6 +6,7 @@ const BrawlStarsAPI = {
     // Official Brawl Stars API Configuration
     // Key Name: User_Info (Your API Key identifier)
     BASE_URL: 'https://api.brawlstars.io/v1',
+    CORS_PROXY: 'https://cors-anywhere.herokuapp.com/',
     API_TOKEN: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL3N1cGVyY2VsbC5jb20iLCJhdWQiOiJodHRwczovL2FwaS5icmF3bHN0YXJzLmNvbSIsImlhdCI6MTczMjExNjI3MiwiZXhwIjoxNzMyMjAyNjcyLCJub25jZSI6IjY2Njg2MjM2NzMwMzM1Mzc3NSIsIm9yZ0lkIjo3NzM1MjcsImtpZCI6IjMifQ.V5PVIqkYKPrGyYxCJ8H8MX_s9lj5RYDL2QcqjkVfPtU', // Your API Token
     
     /**
@@ -22,51 +23,64 @@ const BrawlStarsAPI = {
             console.log('=== ATTEMPTING API CALL ===');
             console.log('Tag:', cleanTag);
             
-            // Try Official Brawl Stars API first
-            let url = `${this.BASE_URL}/players/%23${cleanTag}`;
-            console.log('Trying Official API:', url);
+            // Try RoyaleAPI first (more reliable for browser-based requests)
+            console.log('Trying RoyaleAPI (no CORS issues)...');
+            const royaleUrl = `https://api.royaleapi.com/profile/${cleanTag}`;
+            console.log('RoyaleAPI URL:', royaleUrl);
             
             try {
-                const response = await fetch(url, {
+                const royaleResponse = await fetch(royaleUrl, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'User-Agent': 'BrawlStars-Website'
+                    },
+                    mode: 'cors',
+                    credentials: 'omit'
+                });
+
+                console.log('RoyaleAPI Response Status:', royaleResponse.status);
+
+                if (royaleResponse.ok) {
+                    const royaleData = await royaleResponse.json();
+                    console.log('✅ SUCCESS: RoyaleAPI returned data');
+                    console.log('RoyaleAPI Response:', royaleData);
+                    return this.parseRoyaleAPIData(royaleData);
+                } else {
+                    console.warn('RoyaleAPI returned status:', royaleResponse.status);
+                }
+            } catch (royaleError) {
+                console.warn('RoyaleAPI fetch error:', royaleError.message);
+            }
+
+            // Fallback: Try with CORS proxy for official API
+            console.log('Trying Official API with CORS proxy...');
+            const proxyUrl = `${this.CORS_PROXY}https://api.brawlstars.io/v1/players/%23${cleanTag}`;
+            console.log('Official API (via proxy) URL:', proxyUrl);
+            
+            try {
+                const officialResponse = await fetch(proxyUrl, {
                     method: 'GET',
                     headers: {
                         'Accept': 'application/json',
                         'Authorization': `Bearer ${this.API_TOKEN}`
-                    }
+                    },
+                    mode: 'cors'
                 });
 
-                console.log('API Response Status:', response.status);
+                console.log('Official API Response Status:', officialResponse.status);
 
-                if (response.ok) {
-                    const data = await response.json();
+                if (officialResponse.ok) {
+                    const officialData = await officialResponse.json();
                     console.log('✅ SUCCESS: Official API returned data');
-                    console.log('API Response Data:', data);
-                    return this.parsePlayerData(data);
+                    console.log('Official API Response:', officialData);
+                    return this.parsePlayerData(officialData);
                 }
             } catch (officialError) {
-                console.warn('Official API failed:', officialError.message);
+                console.warn('Official API fetch error:', officialError.message);
             }
 
-            // Fallback: Try RoyaleAPI (works without authentication)
-            console.log('Falling back to RoyaleAPI...');
-            const royaleUrl = `https://api.royaleapi.com/profile/${cleanTag}`;
-            console.log('Trying RoyaleAPI:', royaleUrl);
-            
-            const royaleResponse = await fetch(royaleUrl, {
-                method: 'GET',
-                headers: {
-                    'Accept': 'application/json'
-                }
-            });
-
-            if (!royaleResponse.ok) {
-                throw new Error(`RoyaleAPI Error: ${royaleResponse.status}`);
-            }
-
-            const royaleData = await royaleResponse.json();
-            console.log('✅ SUCCESS: RoyaleAPI returned data');
-            console.log('RoyaleAPI Response:', royaleData);
-            return this.parseRoyaleAPIData(royaleData);
+            throw new Error('All API sources failed');
 
         } catch (error) {
             console.error('All API attempts failed:', error);
