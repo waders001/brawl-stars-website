@@ -1,14 +1,12 @@
 // Brawl Stars API Integration Module
 // This module handles all API calls to fetch player data from Brawl Stars
+// Using Official Brawl Stars API with authentication
 
 const BrawlStarsAPI = {
-    // Using a free CORS proxy and public API endpoint
-    // Note: For production, you'll want to use the official Brawl Stars API with an API key
-    // Get your key from: https://developer.brawlstars.com/
-    
-    // Configuration
+    // Official Brawl Stars API Configuration
+    // Key Name: User_Info (Your API Key identifier)
     BASE_URL: 'https://api.brawlstars.io/v1',
-    PROXY_URL: 'https://cors-anywhere.herokuapp.com/', // CORS proxy for development
+    API_TOKEN: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL3N1cGVyY2VsbC5jb20iLCJhdWQiOiJodHRwczovL2FwaS5icmF3bHN0YXJzLmNvbSIsImlhdCI6MTczMjExNjI3MiwiZXhwIjoxNzMyMjAyNjcyLCJub25jZSI6IjY2Njg2MjM2NzMwMzM1Mzc3NSIsIm9yZ0lkIjo3NzM1MjcsImtpZCI6IjMifQ.V5PVIqkYKPrGyYxCJ8H8MX_s9lj5RYDL2QcqjkVfPtU', // Your API Token
     
     /**
      * Fetch player profile data by Brawl Stars tag
@@ -20,15 +18,21 @@ const BrawlStarsAPI = {
             // Encode the tag properly (replace # with %23 if present)
             const encodedTag = encodeURIComponent(tag.replace('#', ''));
             
-            // Try using the free RoyaleAPI first (no key required)
-            const response = await fetch(`https://api.royaleapi.com/profile/${encodedTag}`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json'
+            // Use Official Brawl Stars API with authentication token
+            const response = await fetch(
+                `${this.BASE_URL}/players/%23${encodedTag}`,
+                {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Authorization': `Bearer ${this.API_TOKEN}`
+                    }
                 }
-            });
+            );
 
             if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                console.error(`API Error: ${response.status}`, errorData);
                 throw new Error(`API Error: ${response.status} - ${response.statusText}`);
             }
 
@@ -37,13 +41,14 @@ const BrawlStarsAPI = {
 
         } catch (error) {
             console.error('Error fetching player profile:', error);
+            // Fall back to mock data for development
             return this.getMockPlayerData(tag);
         }
     },
 
     /**
-     * Parse and format player data from API response
-     * @param {Object} data - Raw API response
+     * Parse and format player data from official API response
+     * @param {Object} data - Raw API response from official Brawl Stars API
      * @returns {Object} Formatted player data
      */
     parsePlayerData(data) {
@@ -52,17 +57,27 @@ const BrawlStarsAPI = {
             name: data.name || 'Unknown Player',
             trophies: data.trophies || 0,
             highestTrophies: data.highestTrophies || 0,
-            level: data.expLevel || 1,
-            wins: data.wins || 0,
-            losses: data.losses || 0,
-            soloVictories: data.soloVictories || 0,
-            duoVictories: data.duoVictories || 0,
-            squadVictories: data.squadVictories || 0,
-            brawlers: data.brawlers || [],
+            expLevel: data.expLevel || 1,
+            expPoints: data.expPoints || 0,
+            wins: data.soloShowdownWins || 0,
+            losses: data.duoShowdownWins || 0,
+            soloVictories: data.soloShowdownWins || 0,
+            duoVictories: data.duoShowdownWins || 0,
+            squadVictories: data.tripleShowdownWins || 0,
+            brawlers: data.brawlers ? data.brawlers.map(b => ({
+                id: b.id,
+                name: b.name,
+                power: b.power,
+                rank: b.rank,
+                trophies: b.trophies,
+                highestTrophies: b.highestTrophies,
+                starPowers: b.starPowers || []
+            })) : [],
             club: data.club ? data.club.name : 'No Club',
             clubTag: data.club ? data.club.tag : null,
-            powerPlayPoints: data.powerPlayPoints || 0,
-            isQualifiedFromChampionshipChallenge: data.isQualifiedFromChampionshipChallenge || false
+            friends: data.friends || [],
+            accountStatus: data.accountStatus || 'active',
+            totalBrawlers: data.brawlers ? data.brawlers.length : 0
         };
     },
 
