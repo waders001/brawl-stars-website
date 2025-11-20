@@ -101,6 +101,16 @@ const BrawlStarsAPI = {
         console.log('=== PARSING ROYALEAPI DATA ===');
         console.log('Raw RoyaleAPI Response:', data);
         
+        // Log all available fields for debugging
+        console.log('Available fields:', Object.keys(data));
+        
+        // Map the fields - RoyaleAPI might use different field names
+        const soloWins = data.soloShowdownWins || data.soloVictories || 0;
+        const duoWins = data.duoShowdownWins || data.duoVictories || 0;
+        const squadWins = data.tripleShowdownWins || data.squadVictories || 0;
+        
+        console.log('Victories - Solo:', soloWins, 'Duo:', duoWins, 'Squad:', squadWins);
+        
         return {
             tag: data.tag || 'N/A',
             name: data.name || 'Unknown Player',
@@ -108,12 +118,15 @@ const BrawlStarsAPI = {
             highestTrophies: data.highestTrophies || 0,
             expLevel: data.expLevel || 1,
             expPoints: data.expPoints || 0,
-            soloShowdownWins: data.soloShowdownWins || 0,
-            duoShowdownWins: data.duoShowdownWins || 0,
-            tripleShowdownWins: data.tripleShowdownWins || 0,
-            soloVictories: data.soloShowdownWins || 0,
-            duoVictories: data.duoShowdownWins || 0,
-            squadVictories: data.tripleShowdownWins || 0,
+            // Try multiple field names for victories
+            soloShowdownWins: soloWins,
+            duoShowdownWins: duoWins,
+            tripleShowdownWins: squadWins,
+            // Aliases
+            soloVictories: soloWins,
+            duoVictories: duoWins,
+            squadVictories: squadWins,
+            // Brawlers array
             brawlers: data.brawlers ? data.brawlers.map(b => ({
                 id: b.id,
                 name: b.name,
@@ -122,8 +135,10 @@ const BrawlStarsAPI = {
                 trophies: b.trophies,
                 highestTrophies: b.highestTrophies
             })) : [],
+            // Club info
             club: data.club ? data.club.name : 'No Club',
             clubTag: data.club ? data.club.tag : null,
+            // Totals
             totalBrawlers: data.brawlers ? data.brawlers.length : 0,
             totalTrophies: (data.brawlers || []).reduce((sum, b) => sum + (b.trophies || 0), 0),
             isRealData: true

@@ -212,8 +212,14 @@ function loadUserStats() {
                 const squadWins = playerData.tripleShowdownWins || 0;
                 const totalVictories = soloWins + duoWins + squadWins;
                 
-                console.log('Victory breakdown - Solo:', soloWins, 'Duo:', duoWins, 'Squad:', squadWins, 'Total:', totalVictories);
+                console.log('🏆 Victory breakdown:');
+                console.log('  Solo Showdown Wins:', soloWins);
+                console.log('  Duo Showdown Wins:', duoWins);
+                console.log('  Squad/Triple Showdown Wins:', squadWins);
+                console.log('  Total Victories:', totalVictories);
+                
                 victoriesCount.textContent = totalVictories.toLocaleString();
+                console.log('✅ Set victories to:', totalVictories);
                 console.log('✅ Set victories to:', totalVictories);
 
                 // Store player data for use in other sections
