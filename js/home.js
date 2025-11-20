@@ -158,7 +158,7 @@ function loadUserStats() {
     // If logged in with tag, fetch real data from API
     if (loginType === 'tag') {
         const brawlTag = sessionStorage.getItem('brawlTag');
-        console.log('Loading stats for tag:', brawlTag);
+        console.log('=== LOADING STATS FOR TAG:', brawlTag, '===');
         
         // Show loading state
         statsSubtitle.textContent = 'Loading your stats...';
@@ -166,16 +166,20 @@ function loadUserStats() {
         highestBrawler.textContent = '⏳';
         victoriesCount.textContent = '⏳';
 
-        // Fetch player data from API
-        BrawlStarsAPI.getPlayerData(brawlTag)
+        // Fetch player data from API - ALWAYS force refresh
+        BrawlStarsAPI.getPlayerData(brawlTag, true)
             .then(playerData => {
-                console.log('Stats loaded successfully:', playerData);
+                console.log('=== STATS LOADED ===');
+                console.log('Is Real Data:', playerData.isRealData);
+                console.log('Player Name:', playerData.name);
+                console.log('Full Player Data:', playerData);
                 
                 // Update stats with proper formatting
                 statsSubtitle.textContent = `${playerData.name}'s Performance`;
                 
                 // Display trophies
                 trophyCount.textContent = playerData.trophies.toLocaleString();
+                console.log('Set trophies to:', playerData.trophies);
                 
                 // Get highest trophy brawler
                 if (playerData.brawlers && playerData.brawlers.length > 0) {
@@ -186,15 +190,16 @@ function loadUserStats() {
                     const topBrawler = sortedBrawlers[0];
                     
                     highestBrawler.textContent = `${topBrawler.name} (${topBrawler.trophies || 0} 🏆)`;
-                    console.log('Highest Brawler:', topBrawler);
+                    console.log('Set highest brawler to:', topBrawler);
                 } else {
                     highestBrawler.textContent = 'No brawlers unlocked';
+                    console.log('No brawlers available');
                 }
                 
                 // Calculate total victories from showdown wins
-                const soloWins = playerData.soloShowdownWins || playerData.soloVictories || 0;
-                const duoWins = playerData.duoShowdownWins || playerData.duoVictories || 0;
-                const squadWins = playerData.tripleShowdownWins || playerData.squadVictories || 0;
+                const soloWins = playerData.soloShowdownWins || 0;
+                const duoWins = playerData.duoShowdownWins || 0;
+                const squadWins = playerData.tripleShowdownWins || 0;
                 const totalVictories = soloWins + duoWins + squadWins;
                 
                 console.log('Victory breakdown - Solo:', soloWins, 'Duo:', duoWins, 'Squad:', squadWins, 'Total:', totalVictories);
@@ -203,9 +208,12 @@ function loadUserStats() {
                 // Store player data for use in other sections
                 sessionStorage.setItem('playerData', JSON.stringify(playerData));
                 
-                // Display additional info in console for debugging
-                console.log('Full Player Data:', playerData);
-                console.log('Total Brawlers:', playerData.totalBrawlers);
+                // Display data status
+                if (playerData.isRealData) {
+                    console.log('✅ DISPLAYING REAL API DATA');
+                } else {
+                    console.warn('⚠️ DISPLAYING MOCK DATA (API call may have failed)');
+                }
             })
             .catch(error => {
                 console.error('Error loading player stats:', error);

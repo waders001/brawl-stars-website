@@ -63,7 +63,14 @@ const BrawlStarsAPI = {
      */
     parsePlayerData(data) {
         // Log raw data for debugging
+        console.log('=== parsePlayerData called ===');
         console.log('Raw API Response:', data);
+        
+        // Check if this looks like real API data or mock data
+        const isRealData = data.brawlers && data.brawlers.length > 0 && data.brawlers[0].id;
+        console.log('Is Real API Data:', isRealData);
+        console.log('Has brawlers:', data.brawlers ? data.brawlers.length : 0);
+        console.log('Player name:', data.name);
         
         // Map official Brawl Stars API fields to our format
         return {
@@ -98,7 +105,8 @@ const BrawlStarsAPI = {
             accountStatus: data.accountStatus || 'active',
             // Calculate totals
             totalBrawlers: data.brawlers ? data.brawlers.length : 0,
-            totalTrophies: (data.brawlers || []).reduce((sum, b) => sum + (b.trophies || 0), 0)
+            totalTrophies: (data.brawlers || []).reduce((sum, b) => sum + (b.trophies || 0), 0),
+            isRealData: isRealData
         };
     },
 
@@ -183,19 +191,11 @@ const BrawlStarsAPI = {
     /**
      * Get player data with caching support
      * @param {string} tag - Player tag
-     * @param {boolean} forceRefresh - Force fresh API call
+     * @param {boolean} forceRefresh - Force fresh API call (default: true on home page)
      * @returns {Promise<Object>} Player data
      */
-    async getPlayerData(tag, forceRefresh = false) {
-        // Check cache first
-        if (!forceRefresh) {
-            const cached = this.getCachedPlayerData(tag);
-            if (cached) {
-                console.log('Using cached player data');
-                return cached;
-            }
-        }
-
+    async getPlayerData(tag, forceRefresh = true) {
+        // Always force refresh on initial load to get fresh data
         // Fetch from API
         const data = await this.getPlayerProfile(tag);
 
