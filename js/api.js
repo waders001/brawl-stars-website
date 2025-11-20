@@ -18,13 +18,45 @@ const BrawlStarsAPI = {
         try {
             // Clean up the tag (remove # if present)
             const cleanTag = tag.replace('#', '').toUpperCase();
-            const encodedTag = encodeURIComponent(cleanTag);
             
             console.log('=== ATTEMPTING API CALL ===');
             console.log('Tag:', cleanTag);
             
-            // Try RoyaleAPI first (more reliable for browser-based requests)
-            console.log('Trying RoyaleAPI (no CORS issues)...');
+            // Try using Netlify Function (server-side API call, no CORS issues)
+            console.log('Trying Netlify Function...');
+            const functionUrl = `/.netlify/functions/getPlayer?tag=${encodeURIComponent(cleanTag)}`;
+            console.log('Function URL:', functionUrl);
+            
+            try {
+                const functionResponse = await fetch(functionUrl, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+
+                console.log('Function Response Status:', functionResponse.status);
+
+                if (functionResponse.ok) {
+                    const result = await functionResponse.json();
+                    console.log('✅ SUCCESS: Netlify Function returned data');
+                    console.log('Data Source:', result.source);
+                    console.log('API Response:', result.data);
+                    
+                    if (result.source === 'official') {
+                        return this.parsePlayerData(result.data);
+                    } else if (result.source === 'royaleapi') {
+                        return this.parseRoyaleAPIData(result.data);
+                    }
+                } else {
+                    console.warn('Function returned status:', functionResponse.status);
+                }
+            } catch (functionError) {
+                console.warn('Netlify Function error:', functionError.message);
+            }
+
+            // Fallback: Try direct RoyaleAPI call
+            console.log('Falling back to direct RoyaleAPI call...');
             const royaleUrl = `https://api.royaleapi.com/profile/${cleanTag}`;
             console.log('RoyaleAPI URL:', royaleUrl);
             
@@ -32,8 +64,7 @@ const BrawlStarsAPI = {
                 const royaleResponse = await fetch(royaleUrl, {
                     method: 'GET',
                     headers: {
-                        'Accept': 'application/json',
-                        'User-Agent': 'BrawlStars-Website'
+                        'Accept': 'application/json'
                     },
                     mode: 'cors',
                     credentials: 'omit'
@@ -43,44 +74,15 @@ const BrawlStarsAPI = {
 
                 if (royaleResponse.ok) {
                     const royaleData = await royaleResponse.json();
-                    console.log('✅ SUCCESS: RoyaleAPI returned data');
+                    console.log('✅ SUCCESS: Direct RoyaleAPI call returned data');
                     console.log('RoyaleAPI Response:', royaleData);
                     return this.parseRoyaleAPIData(royaleData);
-                } else {
-                    console.warn('RoyaleAPI returned status:', royaleResponse.status);
                 }
             } catch (royaleError) {
-                console.warn('RoyaleAPI fetch error:', royaleError.message);
+                console.warn('Direct RoyaleAPI error:', royaleError.message);
             }
 
-            // Fallback: Try with CORS proxy for official API
-            console.log('Trying Official API with CORS proxy...');
-            const proxyUrl = `${this.CORS_PROXY}https://api.brawlstars.io/v1/players/%23${cleanTag}`;
-            console.log('Official API (via proxy) URL:', proxyUrl);
-            
-            try {
-                const officialResponse = await fetch(proxyUrl, {
-                    method: 'GET',
-                    headers: {
-                        'Accept': 'application/json',
-                        'Authorization': `Bearer ${this.API_TOKEN}`
-                    },
-                    mode: 'cors'
-                });
-
-                console.log('Official API Response Status:', officialResponse.status);
-
-                if (officialResponse.ok) {
-                    const officialData = await officialResponse.json();
-                    console.log('✅ SUCCESS: Official API returned data');
-                    console.log('Official API Response:', officialData);
-                    return this.parsePlayerData(officialData);
-                }
-            } catch (officialError) {
-                console.warn('Official API fetch error:', officialError.message);
-            }
-
-            throw new Error('All API sources failed');
+            throw new Error('All API attempts failed');
 
         } catch (error) {
             console.error('All API attempts failed:', error);
