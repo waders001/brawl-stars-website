@@ -62,6 +62,10 @@ const BrawlStarsAPI = {
      * @returns {Object} Formatted player data
      */
     parsePlayerData(data) {
+        // Log raw data for debugging
+        console.log('Raw API Response:', data);
+        
+        // Map official Brawl Stars API fields to our format
         return {
             tag: data.tag || 'N/A',
             name: data.name || 'Unknown Player',
@@ -69,11 +73,15 @@ const BrawlStarsAPI = {
             highestTrophies: data.highestTrophies || 0,
             expLevel: data.expLevel || 1,
             expPoints: data.expPoints || 0,
-            wins: data.soloShowdownWins || 0,
-            losses: data.duoShowdownWins || 0,
+            // Note: Official API uses these field names for victories
+            soloShowdownWins: data.soloShowdownWins || 0,
+            duoShowdownWins: data.duoShowdownWins || 0,
+            tripleShowdownWins: data.tripleShowdownWins || 0,
+            // Alias for easy access
             soloVictories: data.soloShowdownWins || 0,
             duoVictories: data.duoShowdownWins || 0,
             squadVictories: data.tripleShowdownWins || 0,
+            // Brawlers array with all available data
             brawlers: data.brawlers ? data.brawlers.map(b => ({
                 id: b.id,
                 name: b.name,
@@ -81,13 +89,16 @@ const BrawlStarsAPI = {
                 rank: b.rank,
                 trophies: b.trophies,
                 highestTrophies: b.highestTrophies,
-                starPowers: b.starPowers || []
+                starPowers: b.starPowers || [],
+                gadgets: b.gadgets || []
             })) : [],
             club: data.club ? data.club.name : 'No Club',
             clubTag: data.club ? data.club.tag : null,
             friends: data.friends || [],
             accountStatus: data.accountStatus || 'active',
-            totalBrawlers: data.brawlers ? data.brawlers.length : 0
+            // Calculate totals
+            totalBrawlers: data.brawlers ? data.brawlers.length : 0,
+            totalTrophies: (data.brawlers || []).reduce((sum, b) => sum + (b.trophies || 0), 0)
         };
     },
 

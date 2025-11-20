@@ -171,24 +171,33 @@ function loadUserStats() {
             .then(playerData => {
                 console.log('Stats loaded successfully:', playerData);
                 
-                // Update stats
+                // Update stats with proper formatting
                 statsSubtitle.textContent = `${playerData.name}'s Performance`;
+                
+                // Display trophies
                 trophyCount.textContent = playerData.trophies.toLocaleString();
                 
                 // Get highest trophy brawler
                 if (playerData.brawlers && playerData.brawlers.length > 0) {
-                    const highestBrawlerData = playerData.brawlers.reduce((prev, current) => 
-                        (prev.trophies > current.trophies) ? prev : current
+                    // Sort brawlers by trophies and get the top one
+                    const sortedBrawlers = [...playerData.brawlers].sort((a, b) => 
+                        (b.trophies || 0) - (a.trophies || 0)
                     );
-                    highestBrawler.textContent = `${highestBrawlerData.name} (${highestBrawlerData.trophies} 🏆)`;
+                    const topBrawler = sortedBrawlers[0];
+                    
+                    highestBrawler.textContent = `${topBrawler.name} (${topBrawler.trophies || 0} 🏆)`;
+                    console.log('Highest Brawler:', topBrawler);
                 } else {
-                    highestBrawler.textContent = 'No brawlers';
+                    highestBrawler.textContent = 'No brawlers unlocked';
                 }
                 
-                // Calculate total victories
-                const totalVictories = (playerData.soloVictories || 0) + 
-                                      (playerData.duoVictories || 0) + 
-                                      (playerData.squadVictories || 0);
+                // Calculate total victories from showdown wins
+                const soloWins = playerData.soloShowdownWins || playerData.soloVictories || 0;
+                const duoWins = playerData.duoShowdownWins || playerData.duoVictories || 0;
+                const squadWins = playerData.tripleShowdownWins || playerData.squadVictories || 0;
+                const totalVictories = soloWins + duoWins + squadWins;
+                
+                console.log('Victory breakdown - Solo:', soloWins, 'Duo:', duoWins, 'Squad:', squadWins, 'Total:', totalVictories);
                 victoriesCount.textContent = totalVictories.toLocaleString();
 
                 // Store player data for use in other sections
@@ -196,6 +205,7 @@ function loadUserStats() {
                 
                 // Display additional info in console for debugging
                 console.log('Full Player Data:', playerData);
+                console.log('Total Brawlers:', playerData.totalBrawlers);
             })
             .catch(error => {
                 console.error('Error loading player stats:', error);
