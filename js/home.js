@@ -11,6 +11,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Load user stats if logged in
     loadUserStats();
+    
+    // Load live game modes/rotation
+    loadGameModes();
 });
 
 // Authentication Check
@@ -40,6 +43,91 @@ function checkAuthentication() {
             window.location.href = 'index.html';
         }
     });
+}
+
+// Load Live Game Modes / Rotation
+function loadGameModes() {
+    const modesGrid = document.getElementById('modesGrid');
+    if (!modesGrid) return;
+
+    // Clear existing content and show loading
+    modesGrid.innerHTML = '<div class="modes-loading">Loading current game modes and maps...</div>';
+
+    // Try to fetch rotation from the API client
+    BrawlStarsAPI.getGameData('rotation')
+        .then(rotationData => {
+            console.log('Rotation data raw:', rotationData);
+
+            // rotationData may be an array or an object; normalize to array
+            let entries = [];
+            if (!rotationData) entries = [];
+            else if (Array.isArray(rotationData)) entries = rotationData;
+            else if (rotationData.rotation) entries = rotationData.rotation;
+            else if (rotationData.data) entries = rotationData.data;
+            else if (rotationData.events) entries = rotationData.events;
+            else entries = [rotationData];
+
+            // If BrawlStarsAPI provides a parsing helper, use it
+            if (typeof BrawlStarsAPI.parseRotationData === 'function') {
+                try {
+                    entries = BrawlStarsAPI.parseRotationData(entries);
+                } catch (e) {
+                    console.warn('parseRotationData failed, using raw entries', e);
+                }
+            }
+
+            // Build DOM cards
+            if (!entries || entries.length === 0) {
+                modesGrid.innerHTML = '<div class="modes-loading">No rotation data available.</div>';
+                return;
+            }
+
+            modesGrid.innerHTML = '';
+
+            entries.forEach(item => {
+                const modeName = item.modeName || item.mode || item.name || 'Unknown Mode';
+                const mapName = item.mapName || item.map || item.map_name || item.stage || 'Unknown Map';
+
+                const card = document.createElement('div');
+                card.className = 'mode-card';
+
+                const icon = document.createElement('div');
+                icon.className = 'mode-icon';
+                icon.textContent = item.icon || '🎮';
+
+                const h3 = document.createElement('h3');
+                h3.textContent = modeName;
+
+                const p = document.createElement('p');
+                p.textContent = mapName;
+
+                card.appendChild(icon);
+                card.appendChild(h3);
+                card.appendChild(p);
+
+                // Initial animation state
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(30px)';
+                card.style.transition = 'all 0.6s ease';
+
+                modesGrid.appendChild(card);
+
+                // Observe with the existing observer if available
+                try {
+                    if (typeof observer !== 'undefined' && observer && typeof observer.observe === 'function') {
+                        observer.observe(card);
+                    }
+                } catch (e) {
+                    // ignore
+                }
+            });
+
+            console.log('✅ Injected', entries.length, 'mode cards');
+        })
+        .catch(err => {
+            console.error('Error loading game modes:', err);
+            modesGrid.innerHTML = '<div class="modes-loading">Could not load game modes.</div>';
+        });
 }
 
 // Mobile Menu

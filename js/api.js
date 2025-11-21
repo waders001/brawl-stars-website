@@ -7,7 +7,9 @@ const BrawlStarsAPI = {
     // Key Name: User_Info (Your API Key identifier)
     BASE_URL: 'https://api.brawlstars.io/v1',
     CORS_PROXY: 'https://cors-anywhere.herokuapp.com/',
-    API_TOKEN: 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL3N1cGVyY2VsbC5jb20iLCJhdWQiOiJodHRwczovL2FwaS5icmF3bHN0YXJzLmNvbSIsImlhdCI6MTczMjExNjI3MiwiZXhwIjoxNzMyMjAyNjcyLCJub25jZSI6IjY2Njg2MjM2NzMwMzM1Mzc3NSIsIm9yZ0lkIjo3NzM1MjcsImtpZCI6IjMifQ.V5PVIqkYKPrGyYxCJ8H8MX_s9lj5RYDL2QcqjkVfPtU', // Your API Token
+    // NOTE: Do NOT store your real API token in client-side code.
+    // Keep tokens server-side (Vercel functions) via `BRAWL_API_TOKEN` env var.
+    API_TOKEN: null,
     
     /**
      * Fetch player profile data by Brawl Stars tag
@@ -23,10 +25,10 @@ const BrawlStarsAPI = {
             console.log('Tag:', cleanTag);
             
             // Try using Netlify Function (server-side API call, no CORS issues)
-            console.log('Trying Netlify Function...');
-            const functionUrl = `/.netlify/functions/getPlayer?tag=${encodeURIComponent(cleanTag)}`;
+            console.log('Trying serverless function at /api/getPlayer...');
+            const functionUrl = `/api/getPlayer?tag=${encodeURIComponent(cleanTag)}`;
             console.log('Function URL:', functionUrl);
-            
+
             try {
                 const functionResponse = await fetch(functionUrl, {
                     method: 'GET',
@@ -39,10 +41,10 @@ const BrawlStarsAPI = {
 
                 if (functionResponse.ok) {
                     const result = await functionResponse.json();
-                    console.log('✅ SUCCESS: Netlify Function returned data');
+                    console.log('✅ SUCCESS: Function returned data');
                     console.log('Data Source:', result.source);
                     console.log('API Response:', result.data);
-                    
+
                     if (result.source === 'official') {
                         return this.parsePlayerData(result.data);
                     } else if (result.source === 'royaleapi') {
@@ -52,7 +54,7 @@ const BrawlStarsAPI = {
                     console.warn('Function returned status:', functionResponse.status);
                 }
             } catch (functionError) {
-                console.warn('Netlify Function error:', functionError.message);
+                console.warn('Serverless function error:', functionError.message);
             }
 
             // Fallback: Try direct RoyaleAPI call
@@ -291,6 +293,50 @@ const BrawlStarsAPI = {
         this.cachePlayerData(tag, data);
 
         return data;
+    },
+
+    /**
+     * Get current rotation / gamemodes via Netlify Function
+     * @param {string} type - 'rotation' or 'gamemodes'
+     */
+    async getGameData(type = 'rotation') {
+        try {
+            const url = `/api/getGameData?type=${encodeURIComponent(type)}`;
+            console.log('Fetching game data from function:', url);
+            const resp = await fetch(url, { method: 'GET', headers: { 'Accept': 'application/json' } });
+            if (!resp.ok) throw new Error(`Function returned status ${resp.status}`);
+            const result = await resp.json();
+            if (result && result.success && result.data) return result.data;
+            throw new Error('Invalid function response');
+        } catch (err) {
+            console.error('getGameData error:', err);
+            return null;
+        }
+    },
+
+    /**
+     * Helper to parse rotation/gamemodes data into a normalized array
+     * @param {Object} data
+     * @returns {Array} normalized items {modeName, mapName}
+     */
+    parseRotationData(data) {
+        if (!data) return [];
+        // Official API likely returns { events: [...] } for rotation
+        let items = data.events || data.rotation || data.items || data;
+        if (!Array.isArray(items)) {
+            // sometimes wrapped under data.rotation or similar
+            const keys = Object.keys(data);
+            for (const k of keys) {
+                if (Array.isArray(data[k])) { items = data[k]; break; }
+            }
+        }
+
+        items = items || [];
+        return items.map(entry => {
+            const mapName = (entry.map && (entry.map.name || entry.map.mapName)) || entry.mapName || entry.name || (entry.stage && entry.stage.name) || 'Unknown Map';
+            const modeName = (entry.mode && (entry.mode.name || entry.mode)) || entry.modeName || entry.event || entry.gameMode || 'Unknown Mode';
+            return { modeName, mapName, raw: entry };
+        });
     }
 };
 
