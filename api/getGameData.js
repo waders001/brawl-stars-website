@@ -1,21 +1,26 @@
-// Vercel Serverless function to fetch game rotation / gamemodes
-// Uses BRAWL_API_TOKEN from environment when available
-
-const API_TOKEN = process.env.BRAWL_API_TOKEN || null;
-
 module.exports = async (req, res) => {
+  // Enable CORS
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+
   try {
-    const type = (req.query?.type) || (req.body && req.body.type) || 'rotation';
-    console.log('getGameData type:', type);
+    const API_TOKEN = process.env.BRAWL_API_TOKEN;
+    const type = req.query?.type || 'rotation';
+    
+    console.log('Game data request - type:', type);
 
-    let url;
-    if (type === 'gamemodes') url = `https://api.brawlstars.io/v1/gamemodes`;
-    else url = `https://api.brawlstars.io/v1/events/rotation`;
-
-    // Try official API when token is present
     if (API_TOKEN) {
       try {
-        const resp = await fetch(url, {
+        const url = type === 'gamemodes' 
+          ? 'https://api.brawlstars.com/v1/gamemodes'
+          : 'https://api.brawlstars.com/v1/events/rotation';
+          
+        const response = await fetch(url, {
           method: 'GET',
           headers: {
             'Accept': 'application/json',
@@ -23,37 +28,58 @@ module.exports = async (req, res) => {
           }
         });
 
-        if (resp.ok) {
-          const data = await resp.json();
-          return res.status(200).json({ success: true, source: 'official', data });
+        if (response.ok) {
+          const data = await response.json();
+          
+          // Parse the rotation data
+          if (type === 'rotation' && data) {
+            // The official API returns an array of events
+            const events = Array.isArray(data) ? data : (data.items || data.events || []);
+            const parsedEvents = events.map(event => ({
+              modeName: event.event?.mode || 'Unknown Mode',
+              mapName: event.event?.map || 'Unknown Map',
+              startTime: event.startTime,
+              endTime: event.endTime
+            }));
+            
+            return res.status(200).json({ 
+              success: true, 
+              source: 'official', 
+              data: parsedEvents 
+            });
+          }
+          
+          return res.status(200).json({ 
+            success: true, 
+            source: 'official', 
+            data 
+          });
         }
-        console.warn('Official API returned', resp.status);
+        
+        console.log('API returned status:', response.status);
       } catch (err) {
-        console.warn('Official API error:', err.message || err);
+        console.error('API error:', err);
       }
-    } else {
-      console.warn('No BRAWL_API_TOKEN configured; skipping official API');
     }
 
-    // Fallback to RoyaleAPI
-    try {
-      let royaleUrl;
-      if (type === 'gamemodes') royaleUrl = `https://api.royaleapi.com/gamemodes`;
-      else royaleUrl = `https://api.royaleapi.com/rotation`;
+    // Return mock rotation
+    const mockRotation = [
+      { modeName: 'Gem Grab', mapName: 'Hard Rock Mine' },
+      { modeName: 'Solo Showdown', mapName: 'Feast or Famine' },
+      { modeName: 'Brawl Ball', mapName: 'Pinhole Punt' },
+      { modeName: 'Heist', mapName: 'Safe Zone' },
+      { modeName: 'Bounty', mapName: 'Snake Prairie' },
+      { modeName: 'Knockout', mapName: 'Goldarm Gulch' }
+    ];
+    
+    return res.status(200).json({ 
+      success: true, 
+      source: 'mock', 
+      data: mockRotation 
+    });
 
-      const r = await fetch(royaleUrl, { method: 'GET', headers: { 'Accept': 'application/json' } });
-      if (r.ok) {
-        const data = await r.json();
-        return res.status(200).json({ success: true, source: 'royaleapi', data });
-      }
-      console.warn('RoyaleAPI returned', r.status);
-    } catch (err) {
-      console.warn('RoyaleAPI error:', err.message || err);
-    }
-
-    return res.status(500).json({ success: false, error: 'All API sources failed' });
   } catch (error) {
     console.error('Function error:', error);
-    return res.status(500).json({ error: error.message || String(error) });
+    return res.status(500).json({ error: error.message });
   }
 };
